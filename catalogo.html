@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ping-T | Catálogo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <header>
+    <h1>Ping-T</h1>
+    <nav>
+      <a href="index.html">Inicio</a>
+      <a href="catalogo.html">Catálogo</a>
+      <a href="carrito.html">Carrito</a>
+      <a href="login.html">Login</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Catálogo de Equipos</h2>
+
+    <!-- Filtros simples -->
+    <div class="filtros">
+      <input id="buscador" type="text" placeholder="Buscar por nombre, marca o modelo..." />
+      <select id="filtroCategoria">
+        <option value="Todos">Todas las categorías</option>
+        <option value="Router">Router</option>
+        <option value="Switch">Switch</option>
+        <option value="Antena">Antena</option>
+        <option value="Camara IP">Cámara IP</option>
+        <option value="VoIP">Teléfono VoIP</option>
+      </select>
+    </div>
+
+    <!-- Aquí se dibujan las tarjetas -->
+    <section id="listaProductos" class="grid"></section>
+  </main>
+
+  <footer>
+    <p>© 2026 Ping-T - Todos los derechos reservados</p>
+  </footer>
+
+  <script src="js/productos.js"></script>
+</body>
+</html>
