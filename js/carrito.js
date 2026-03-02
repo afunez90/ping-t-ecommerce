@@ -1,37 +1,37 @@
 class Carrito {
-    constructor() {
-        this.items = JSON.parse(localStorage.getItem("carrito")) || [];
-    }
+  #items;
 
-    agregar(idProducto) {
-        this.items.push(idProducto);
-        this.guardar();
-    }
+  constructor() {
+    this.#items = JSON.parse(localStorage.getItem("carrito")) || [];
+  }
 
-    eliminar(idProducto) {
-        this.items = this.items.filter(id => id !== idProducto);
-        this.guardar();
-    }
+  getItems() {
+    return this.#items;
+  }
 
-    guardar() {
-        localStorage.setItem("carrito", JSON.stringify(this.items));
-    }
+  agregar(idProducto) {
+    if (!idProducto) throw new Error("ID inválido");
+    this.#items.push(idProducto);
+    this.#guardar();
+  }
 
-    vaciar() {
-        this.items = [];
-        this.guardar();
-    }
+  eliminar(idProducto) {
+    this.#items = this.#items.filter(id => id !== idProducto);
+    this.#guardar();
+  }
 
-    obtenerItems() {
-        return this.items;
-    }
+  calcularTotal(listaProductos) {
+    let total = 0;
+    this.#items.forEach(id => {
+      const p = listaProductos.find(prod => prod.getId() === id);
+      if (p) total += p.getPrecio();
+    });
+    return total;
+  }
 
-    calcularTotal(listaProductos) {
-        let total = 0;
-        this.items.forEach(id => {
-            const producto = listaProductos.find(p => p.id === id);
-            if (producto) total += producto.precio;
-        });
-        return total;
-    }
+  #guardar() {
+    localStorage.setItem("carrito", JSON.stringify(this.#items));
+  }
 }
+
+window.Carrito = Carrito;
