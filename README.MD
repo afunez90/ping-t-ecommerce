@@ -47,5 +47,26 @@ La clase `Producto` hereda de `Item` y agrega propiedades específicas (marca, m
 2. Ejecutar con Live Server (Open with Live Server)
 3. Navegar a `catalogo.html`
 
+## Abstracción: Gestión de Inventario
+Se implementó una clase abstracta `GestorInventario` con métodos abstractos:
+- `anadirProducto(producto)`
+- `eliminarProducto(idProducto)`
+- `actualizarStock(idProducto, nuevoStock)`
+
+Implementaciones:
+- `InventarioFisico`: controla stock real (no permite negativos).
+- `InventarioDigital`: simula disponibilidad ilimitada (stock virtual 9999).
+
+## Interfaces (Contrato) para Pagos
+Como JavaScript no posee interfaces nativas, se definió un contrato `ProcesoPago` y una función
+`asegurarImplementaInterfaz()` que valida que las clases de pago implementen:
+- `iniciarPago()`
+- `verificarPago()`
+- `confirmarPago()`
+
+Implementaciones:
+- `PagoTarjeta`
+- `PagoPayPal`
+
 ## Autor
 Abner Funez
