@@ -253,3 +253,23 @@ function initProductoDetalle() {
     alert("Producto agregado al carrito");
   });
 }
+document.addEventListener("DOMContentLoaded", () => {
+
+  const btnLogin = document.querySelector("a[href='login.html']");
+  const modal = document.getElementById("modalLogin");
+  const cerrar = document.getElementById("cerrarModal");
+
+  if (btnLogin && modal) {
+    btnLogin.addEventListener("click", (e) => {
+      e.preventDefault();
+      modal.style.display = "flex";
+    });
+  }
+
+  if (cerrar) {
+    cerrar.addEventListener("click", () => {
+      modal.style.display = "none";
+    });
+  }
+
+});

@@ -133,9 +133,12 @@ footer {
 }
 
 .logo {
-  width: 42px;
-  height: 42px;
+  width: 45px;
+  height: 45px;
   object-fit: contain;
+  background: white;
+  padding: 6px;
+  border-radius: 8px;
 }
 
 .brand-name {
