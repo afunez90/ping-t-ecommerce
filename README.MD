@@ -37,10 +37,6 @@ La clase `Producto` hereda de `Item` y agrega propiedades específicas (marca, m
 - Carrito: agregar, quitar, eliminar, total
 - Persistencia con LocalStorage
 
-## Capturas
-Agrega aquí imágenes (ejemplo):
-- Catálogo: `assets/img/captura-catalogo.png`
-- Carrito: `assets/img/captura-carrito.png`
 
 ## Desafíos y soluciones
 - **Problemas de carga de scripts y cache:** se resolvió ejecutando el proyecto con Live Server y ordenando los scripts.
