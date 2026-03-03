@@ -4,18 +4,15 @@ document.addEventListener("DOMContentLoaded", () => {
   actualizarContadorCarrito();
   initCatalogo();
   initCarrito();
+  initProductoDetalle();
 });
 
 /* =========================
-   Utilidades
+   UTILIDADES
 ========================= */
 
 function getCarritoArray() {
   return JSON.parse(localStorage.getItem("carrito")) || [];
-}
-
-function setCarritoArray(arr) {
-  localStorage.setItem("carrito", JSON.stringify(arr));
 }
 
 function actualizarContadorCarrito() {
@@ -30,7 +27,7 @@ function actualizarContadorCarrito() {
 
 function initCatalogo() {
   const contenedor = document.getElementById("listaProductos");
-  if (!contenedor) return; // no estamos en catalogo.html
+  if (!contenedor) return; // no es catalogo.html
 
   const buscador = document.getElementById("buscador");
   const filtroCategoria = document.getElementById("filtroCategoria");
@@ -52,6 +49,7 @@ function initCatalogo() {
     arr.forEach((p) => {
       const card = document.createElement("div");
       card.className = "card";
+
       card.innerHTML = `
         <span class="badge">${p.categoria}</span>
         <h3>${p.nombre}</h3>
@@ -67,7 +65,7 @@ function initCatalogo() {
       contenedor.appendChild(card);
     });
 
-    // Eventos "Ver"
+    // Ver detalle
     contenedor.querySelectorAll("[data-ver]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const id = Number(btn.getAttribute("data-ver"));
@@ -76,7 +74,7 @@ function initCatalogo() {
       });
     });
 
-    // Eventos "Agregar"
+    // Agregar al carrito
     contenedor.querySelectorAll("[data-add]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const id = Number(btn.getAttribute("data-add"));
@@ -99,6 +97,7 @@ function initCatalogo() {
         p.modelo.toLowerCase().includes(q);
 
       const coincideCategoria = cat === "Todos" ? true : p.categoria === cat;
+
       return coincideTexto && coincideCategoria;
     });
 
@@ -118,7 +117,7 @@ function initCatalogo() {
 function initCarrito() {
   const contenedor = document.getElementById("contenedorCarrito");
   const totalUI = document.getElementById("totalCarrito");
-  if (!contenedor || !totalUI) return; // no estamos en carrito.html
+  if (!contenedor || !totalUI) return; // no es carrito.html
 
   const listaProductos = window.productos;
   if (!Array.isArray(listaProductos)) {
@@ -128,7 +127,7 @@ function initCarrito() {
   }
 
   const carrito = new Carrito();
-  const items = carrito.obtenerItems();
+  const items = carrito.items; // getter retorna copia
 
   if (!items || items.length === 0) {
     contenedor.innerHTML = "<p>Tu carrito está vacío.</p>";
@@ -137,7 +136,7 @@ function initCarrito() {
     return;
   }
 
-  // conteo por id (para cantidades)
+  // conteo por id
   const conteo = {};
   items.forEach((id) => (conteo[id] = (conteo[id] || 0) + 1));
 
@@ -156,6 +155,7 @@ function initCarrito() {
 
     const card = document.createElement("div");
     card.className = "card";
+
     card.innerHTML = `
       <span class="badge">${p.categoria}</span>
       <h3>${p.nombre}</h3>
@@ -170,41 +170,86 @@ function initCarrito() {
         <button class="btn-sec" data-del="${p.id}">Eliminar</button>
       </div>
     `;
+
     contenedor.appendChild(card);
   });
 
   totalUI.innerHTML = `<h3>Total: $${total.toFixed(2)}</h3>`;
   actualizarContadorCarrito();
 
-  // + (agrega 1)
+  // + agrega 1
   contenedor.querySelectorAll("[data-plus]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const id = Number(btn.getAttribute("data-plus"));
-      carrito.agregar(id);
+      const c = new Carrito();
+      c.agregar(id);
       initCarrito();
     });
   });
 
-  // - (quita 1 ocurrencia)
+  // - quita 1 (quita una ocurrencia)
   contenedor.querySelectorAll("[data-minus]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const id = Number(btn.getAttribute("data-minus"));
-      const arr = carrito.obtenerItems();
-      const idx = arr.indexOf(id);
-      if (idx !== -1) {
-        arr.splice(idx, 1);
-        setCarritoArray(arr);
-      }
+      const c = new Carrito();
+      c.quitarUno(id);
       initCarrito();
     });
   });
 
-  // Eliminar (quita todas las ocurrencias de ese id)
+  // Eliminar todas las ocurrencias
   contenedor.querySelectorAll("[data-del]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const id = Number(btn.getAttribute("data-del"));
-      carrito.eliminar(id);
+      const c = new Carrito();
+      c.eliminar(id);
       initCarrito();
     });
+  });
+}
+
+/* =========================
+   DETALLE (producto.html)
+========================= */
+
+function initProductoDetalle() {
+  const contenedor = document.getElementById("detalleProducto");
+  if (!contenedor) return; // no es producto.html
+
+  const lista = window.productos;
+  if (!Array.isArray(lista)) {
+    contenedor.innerHTML = "<p>Error: productos no cargados.</p>";
+    return;
+  }
+
+  const id = Number(localStorage.getItem("productoSeleccionado"));
+  const p = lista.find((x) => x.id === id);
+
+  if (!p) {
+    contenedor.innerHTML = "<p>No se encontró el producto.</p>";
+    return;
+  }
+
+  contenedor.innerHTML = `
+    <div class="card">
+      <span class="badge">${p.categoria}</span>
+      <h3>${p.nombre}</h3>
+      <p><strong>Marca:</strong> ${p.marca}</p>
+      <p><strong>Modelo:</strong> ${p.modelo}</p>
+      <p><strong>Stock:</strong> ${p.stock}</p>
+      <div class="precio">$${Number(p.precio).toFixed(2)}</div>
+
+      <div class="acciones">
+        <button class="btn-sec" id="btnAgregarDetalle">Agregar al carrito</button>
+        <a class="btn" href="catalogo.html">Volver</a>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("btnAgregarDetalle").addEventListener("click", () => {
+    const carrito = new Carrito();
+    carrito.agregar(p.id);
+    actualizarContadorCarrito();
+    alert("Producto agregado al carrito");
   });
 }
