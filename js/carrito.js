@@ -1,52 +1,129 @@
-// js/carrito.js
-class Carrito {
-  #items; // array de IDs
+export class Carrito {
+    #items;
 
-  constructor() {
-    this.#items = JSON.parse(localStorage.getItem("carrito")) || [];
-  }
-
-  get items() {
-    // devuelve copia para no exponer el arreglo interno directamente
-    return [...this.#items];
-  }
-
-  agregar(idProducto) {
-    if (!Number.isInteger(idProducto) || idProducto <= 0) throw new Error("ID de producto inválido.");
-    this.#items.push(idProducto);
-    this.#guardar();
-  }
-
-  quitarUno(idProducto) {
-    const idx = this.#items.indexOf(idProducto);
-    if (idx !== -1) {
-      this.#items.splice(idx, 1);
-      this.#guardar();
+    constructor() {
+        const guardado = JSON.parse(localStorage.getItem("carrito"));
+        this.#items = Array.isArray(guardado) ? guardado : [];
     }
-  }
 
-  eliminar(idProducto) {
-    this.#items = this.#items.filter((id) => id !== idProducto);
-    this.#guardar();
-  }
+    get items() {
+        return [...this.#items];
+    }
 
-  vaciar() {
-    this.#items = [];
-    this.#guardar();
-  }
+    guardar() {
+        localStorage.setItem("carrito", JSON.stringify(this.#items));
+    }
 
-  calcularTotal(listaProductos) {
-    let total = 0;
-    this.#items.forEach((id) => {
-      const p = listaProductos.find((x) => x.id === id);
-      if (p) total += p.precio;
-    });
-    return total;
-  }
+    agregarProducto(producto, cantidad = 1) {
+        if (!producto || typeof producto !== "object") {
+            throw new Error("Producto inválido");
+        }
 
-  #guardar() {
-    localStorage.setItem("carrito", JSON.stringify(this.#items));
-  }
+        if (cantidad <= 0) {
+            throw new Error("Cantidad inválida");
+        }
+
+        const existente = this.#items.find(
+            item => item.producto && item.producto.id === producto.id
+        );
+
+        if (existente) {
+            const nuevaCantidad = existente.cantidad + cantidad;
+
+            if (nuevaCantidad > producto.stock) {
+                throw new Error(`No puedes agregar más de ${producto.stock} unidades de ${producto.nombre}`);
+            }
+
+            existente.cantidad = nuevaCantidad;
+        } else {
+            if (cantidad > producto.stock) {
+                throw new Error(`No puedes agregar más de ${producto.stock} unidades de ${producto.nombre}`);
+            }
+
+            this.#items.push({
+                producto: {
+                    id: producto.id,
+                    nombre: producto.nombre,
+                    precio: Number(producto.precio),
+                    categoria: producto.categoria,
+                    stock: Number(producto.stock)
+                },
+                cantidad: Number(cantidad)
+            });
+        }
+
+        this.guardar();
+    }
+
+    actualizarCantidad(index, nuevaCantidad) {
+        if (index < 0 || index >= this.#items.length) {
+            throw new Error("Índice inválido");
+        }
+
+        if (nuevaCantidad <= 0) {
+            throw new Error("La cantidad debe ser mayor que cero");
+        }
+
+        const item = this.#items[index];
+
+        if (nuevaCantidad > item.producto.stock) {
+            throw new Error(`Solo hay ${item.producto.stock} unidades disponibles`);
+        }
+
+        item.cantidad = Number(nuevaCantidad);
+        this.guardar();
+    }
+
+    aumentarCantidad(index) {
+        if (index < 0 || index >= this.#items.length) {
+            throw new Error("Índice inválido");
+        }
+
+        const item = this.#items[index];
+
+        if (item.cantidad >= item.producto.stock) {
+            throw new Error(`Solo hay ${item.producto.stock} unidades disponibles`);
+        }
+
+        item.cantidad += 1;
+        this.guardar();
+    }
+
+    disminuirCantidad(index) {
+        if (index < 0 || index >= this.#items.length) {
+            throw new Error("Índice inválido");
+        }
+
+        const item = this.#items[index];
+
+        if (item.cantidad > 1) {
+            item.cantidad -= 1;
+        } else {
+            this.#items.splice(index, 1);
+        }
+
+        this.guardar();
+    }
+
+    eliminarProducto(index) {
+        if (index < 0 || index >= this.#items.length) {
+            throw new Error("Índice inválido");
+        }
+
+        this.#items.splice(index, 1);
+        this.guardar();
+    }
+
+    vaciarCarrito() {
+        this.#items = [];
+        this.guardar();
+    }
+
+    calcularTotal() {
+        return this.#items.reduce((total, item) => {
+            const precio = Number(item.producto.precio);
+            const cantidad = Number(item.cantidad);
+            return total + (precio * cantidad);
+        }, 0);
+    }
 }
-
-window.Carrito = Carrito;

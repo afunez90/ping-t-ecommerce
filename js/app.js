@@ -1,4 +1,14 @@
-// js/app.js
+import { Producto } from './productos.js';
+import { Carrito } from './carrito.js';
+
+const productos = [
+  new Producto(1, "Router MikroTik", 120.00, "Redes", 10),
+  new Producto(2, "Switch Cisco", 250.00, "Redes", 5),
+  new Producto(3, "Access Point Ubiquiti", 180.00, "Wireless", 8),
+  new Producto(4, "Cable UTP Cat6", 15.00, "Cableado", 50)
+];
+
+const carrito = new Carrito();
 
 document.addEventListener("DOMContentLoaded", () => {
   actualizarContadorCarrito();
@@ -7,41 +17,28 @@ document.addEventListener("DOMContentLoaded", () => {
   initProductoDetalle();
 });
 
-/* =========================
-   UTILIDADES
-========================= */
-
-function getCarritoArray() {
-  return JSON.parse(localStorage.getItem("carrito")) || [];
-}
-
 function actualizarContadorCarrito() {
   const span = document.getElementById("contadorCarrito");
   if (!span) return;
-  span.textContent = getCarritoArray().length;
-}
 
-/* =========================
-   CATÁLOGO (catalogo.html)
-========================= */
+  const totalCantidad = carrito.items.reduce((acc, item) => {
+    return acc + Number(item.cantidad || 0);
+  }, 0);
+
+  span.textContent = totalCantidad;
+}
 
 function initCatalogo() {
   const contenedor = document.getElementById("listaProductos");
-  if (!contenedor) return; // no es catalogo.html
+  if (!contenedor) return;
 
   const buscador = document.getElementById("buscador");
   const filtroCategoria = document.getElementById("filtroCategoria");
 
-  const lista = window.productos;
-  if (!Array.isArray(lista)) {
-    contenedor.innerHTML = "<p>Error: productos no cargados.</p>";
-    return;
-  }
-
   function render(arr) {
     contenedor.innerHTML = "";
 
-    if (arr.length === 0) {
+    if (!arr || arr.length === 0) {
       contenedor.innerHTML = "<p>No se encontraron productos.</p>";
       return;
     }
@@ -53,8 +50,6 @@ function initCatalogo() {
       card.innerHTML = `
         <span class="badge">${p.categoria}</span>
         <h3>${p.nombre}</h3>
-        <p><strong>Marca:</strong> ${p.marca}</p>
-        <p><strong>Modelo:</strong> ${p.modelo}</p>
         <p><strong>Stock:</strong> ${p.stock}</p>
         <div class="precio">$${Number(p.precio).toFixed(2)}</div>
         <div class="acciones">
@@ -62,10 +57,10 @@ function initCatalogo() {
           <button class="btn-sec" data-add="${p.id}">Agregar</button>
         </div>
       `;
+
       contenedor.appendChild(card);
     });
 
-    // Ver detalle
     contenedor.querySelectorAll("[data-ver]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const id = Number(btn.getAttribute("data-ver"));
@@ -74,14 +69,20 @@ function initCatalogo() {
       });
     });
 
-    // Agregar al carrito
     contenedor.querySelectorAll("[data-add]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const id = Number(btn.getAttribute("data-add"));
-        const carrito = new Carrito();
-        carrito.agregar(id);
-        actualizarContadorCarrito();
-        alert("Producto agregado al carrito");
+        const producto = productos.find((p) => p.id === id);
+
+        if (producto) {
+          try {
+            carrito.agregarProducto(producto, 1);
+            actualizarContadorCarrito();
+            alert("Producto agregado al carrito");
+          } catch (error) {
+            alert(error.message);
+          }
+        }
       });
     });
   }
@@ -90,14 +91,9 @@ function initCatalogo() {
     const q = (buscador?.value || "").toLowerCase().trim();
     const cat = filtroCategoria?.value || "Todos";
 
-    const filtrados = lista.filter((p) => {
-      const coincideTexto =
-        p.nombre.toLowerCase().includes(q) ||
-        p.marca.toLowerCase().includes(q) ||
-        p.modelo.toLowerCase().includes(q);
-
+    const filtrados = productos.filter((p) => {
+      const coincideTexto = p.nombre.toLowerCase().includes(q);
       const coincideCategoria = cat === "Todos" ? true : p.categoria === cat;
-
       return coincideTexto && coincideCategoria;
     });
 
@@ -107,27 +103,15 @@ function initCatalogo() {
   buscador?.addEventListener("input", aplicarFiltros);
   filtroCategoria?.addEventListener("change", aplicarFiltros);
 
-  render(lista);
+  render(productos);
 }
-
-/* =========================
-   CARRITO (carrito.html)
-========================= */
 
 function initCarrito() {
   const contenedor = document.getElementById("contenedorCarrito");
   const totalUI = document.getElementById("totalCarrito");
-  if (!contenedor || !totalUI) return; // no es carrito.html
+  if (!contenedor || !totalUI) return;
 
-  const listaProductos = window.productos;
-  if (!Array.isArray(listaProductos)) {
-    contenedor.innerHTML = "<p>Error: productos no cargados.</p>";
-    totalUI.innerHTML = "";
-    return;
-  }
-
-  const carrito = new Carrito();
-  const items = carrito.items; // getter retorna copia
+  const items = carrito.items;
 
   if (!items || items.length === 0) {
     contenedor.innerHTML = "<p>Tu carrito está vacío.</p>";
@@ -136,22 +120,15 @@ function initCarrito() {
     return;
   }
 
-  // conteo por id
-  const conteo = {};
-  items.forEach((id) => (conteo[id] = (conteo[id] || 0) + 1));
-
   contenedor.innerHTML = "";
-  let total = 0;
 
-  Object.keys(conteo).forEach((idStr) => {
-    const id = Number(idStr);
-    const cantidad = conteo[id];
+  items.forEach((item, index) => {
+    const p = item.producto;
+    const cantidad = Number(item.cantidad);
 
-    const p = listaProductos.find((x) => x.id === id);
     if (!p) return;
 
-    const subTotal = p.precio * cantidad;
-    total += subTotal;
+    const subTotal = Number(p.precio) * cantidad;
 
     const card = document.createElement("div");
     card.className = "card";
@@ -159,71 +136,61 @@ function initCarrito() {
     card.innerHTML = `
       <span class="badge">${p.categoria}</span>
       <h3>${p.nombre}</h3>
-      <p><strong>Marca:</strong> ${p.marca}</p>
-      <p><strong>Modelo:</strong> ${p.modelo}</p>
+      <p><strong>Stock disponible:</strong> ${p.stock}</p>
       <p><strong>Cantidad:</strong> ${cantidad}</p>
       <p><strong>Subtotal:</strong> $${subTotal.toFixed(2)}</p>
-
       <div class="acciones">
-        <button class="btn" data-plus="${p.id}">+</button>
-        <button class="btn" data-minus="${p.id}">-</button>
-        <button class="btn-sec" data-del="${p.id}">Eliminar</button>
+        <button class="btn" data-minus="${index}">-</button>
+        <button class="btn" data-plus="${index}">+</button>
+        <button class="btn-sec" data-del="${index}">Eliminar</button>
       </div>
     `;
 
     contenedor.appendChild(card);
   });
 
-  totalUI.innerHTML = `<h3>Total: $${total.toFixed(2)}</h3>`;
+  totalUI.innerHTML = `<h3>Total: $${carrito.calcularTotal().toFixed(2)}</h3>`;
   actualizarContadorCarrito();
 
-  // + agrega 1
   contenedor.querySelectorAll("[data-plus]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const id = Number(btn.getAttribute("data-plus"));
-      const c = new Carrito();
-      c.agregar(id);
-      initCarrito();
+      const index = Number(btn.getAttribute("data-plus"));
+      try {
+        carrito.aumentarCantidad(index);
+        initCarrito();
+      } catch (error) {
+        alert(error.message);
+      }
     });
   });
 
-  // - quita 1 (quita una ocurrencia)
   contenedor.querySelectorAll("[data-minus]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const id = Number(btn.getAttribute("data-minus"));
-      const c = new Carrito();
-      c.quitarUno(id);
-      initCarrito();
+      const index = Number(btn.getAttribute("data-minus"));
+      try {
+        carrito.disminuirCantidad(index);
+        initCarrito();
+      } catch (error) {
+        alert(error.message);
+      }
     });
   });
 
-  // Eliminar todas las ocurrencias
   contenedor.querySelectorAll("[data-del]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const id = Number(btn.getAttribute("data-del"));
-      const c = new Carrito();
-      c.eliminar(id);
+      const index = Number(btn.getAttribute("data-del"));
+      carrito.eliminarProducto(index);
       initCarrito();
     });
   });
 }
 
-/* =========================
-   DETALLE (producto.html)
-========================= */
-
 function initProductoDetalle() {
   const contenedor = document.getElementById("detalleProducto");
-  if (!contenedor) return; // no es producto.html
-
-  const lista = window.productos;
-  if (!Array.isArray(lista)) {
-    contenedor.innerHTML = "<p>Error: productos no cargados.</p>";
-    return;
-  }
+  if (!contenedor) return;
 
   const id = Number(localStorage.getItem("productoSeleccionado"));
-  const p = lista.find((x) => x.id === id);
+  const p = productos.find((x) => x.id === id);
 
   if (!p) {
     contenedor.innerHTML = "<p>No se encontró el producto.</p>";
@@ -234,11 +201,8 @@ function initProductoDetalle() {
     <div class="card">
       <span class="badge">${p.categoria}</span>
       <h3>${p.nombre}</h3>
-      <p><strong>Marca:</strong> ${p.marca}</p>
-      <p><strong>Modelo:</strong> ${p.modelo}</p>
       <p><strong>Stock:</strong> ${p.stock}</p>
       <div class="precio">$${Number(p.precio).toFixed(2)}</div>
-
       <div class="acciones">
         <button class="btn-sec" id="btnAgregarDetalle">Agregar al carrito</button>
         <a class="btn" href="catalogo.html">Volver</a>
@@ -247,29 +211,12 @@ function initProductoDetalle() {
   `;
 
   document.getElementById("btnAgregarDetalle").addEventListener("click", () => {
-    const carrito = new Carrito();
-    carrito.agregar(p.id);
-    actualizarContadorCarrito();
-    alert("Producto agregado al carrito");
+    try {
+      carrito.agregarProducto(p, 1);
+      actualizarContadorCarrito();
+      alert("Producto agregado al carrito");
+    } catch (error) {
+      alert(error.message);
+    }
   });
 }
-document.addEventListener("DOMContentLoaded", () => {
-
-  const btnLogin = document.querySelector("a[href='login.html']");
-  const modal = document.getElementById("modalLogin");
-  const cerrar = document.getElementById("cerrarModal");
-
-  if (btnLogin && modal) {
-    btnLogin.addEventListener("click", (e) => {
-      e.preventDefault();
-      modal.style.display = "flex";
-    });
-  }
-
-  if (cerrar) {
-    cerrar.addEventListener("click", () => {
-      modal.style.display = "none";
-    });
-  }
-
-});

@@ -68,5 +68,48 @@ Implementaciones:
 - `PagoTarjeta`
 - `PagoPayPal`
 
+## Mejoras implementadas (actualización reciente)
+
+### Portada visual (Hero Banner)
+Se incorporó una sección de portada en la página principal (`index.html`) con una imagen representativa del entorno de telecomunicaciones.  
+Se aplicó un diseño tipo **banner profesional (estilo Amazon)** utilizando:
+
+- Imagen de fondo (`portada.png`)
+- Capa oscura (overlay con degradado)
+- Texto descriptivo sobre la imagen
+- Botón de acceso directo al catálogo
+
+Esto mejora la experiencia visual y la presentación general del sistema.
+
+---
+
+### Mejora en navegación (Navbar)
+Se corrigió la duplicación del botón de carrito en la barra de navegación, dejando un único elemento funcional:
+
+
+Donde `X` representa la cantidad total de productos en el carrito, actualizada dinámicamente.
+
+---
+
+### Mejora en Carrito de Compras
+Se optimizó completamente la lógica del carrito (`carrito.js` y `app.js`):
+
+#### Nuevas funcionalidades:
+- Incremento de cantidad (`+`)
+- Disminución de cantidad (`-`)
+- Eliminación de productos
+- Cálculo dinámico de subtotales
+- Cálculo automático del total general
+
+---
+
+### Validación de Stock
+Se implementó una validación crítica:
+
+- No se permite agregar más productos que el stock disponible
+- Se muestra un mensaje de error si se intenta exceder el límite
+
+
+
 ## Autor
 Abner Funez

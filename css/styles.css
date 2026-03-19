@@ -166,3 +166,87 @@ footer {
   cursor: pointer;
   font-size: 20px;
 }
+.hero {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.hero img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.hero {
+  margin-top: 20px;
+}
+
+.hero img {
+  width: 100%;
+  height: 450px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.hero {
+  position: relative;
+  width: 100%;
+  margin-top: 20px;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+/* Imagen */
+.hero img {
+  width: 100%;
+  height: 450px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Capa oscura tipo Amazon */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.7) 0%,
+    rgba(0,0,0,0.4) 40%,
+    rgba(0,0,0,0.8) 100%
+  );
+}
+
+/* Contenido encima */
+.hero-content {
+  position: absolute;
+  bottom: 40px;
+  left: 40px;
+  color: #fff;
+  max-width: 500px;
+}
+
+.hero-content h2 {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.hero-content p {
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+/* Botón tipo Amazon */
+.btn-hero {
+  background: #00a8e8;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.btn-hero:hover {
+  background: #0077b6;
+}
