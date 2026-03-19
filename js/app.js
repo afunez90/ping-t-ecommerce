@@ -1,5 +1,8 @@
 import { Producto } from './productos.js';
 import { Carrito } from './carrito.js';
+import { Pedido } from "./pedido.js";
+import { ConfiguracionSistema } from "./configuracionSistema.js";
+import { FabricaEntidades } from "./fabricaEntidades.js";
 
 const productos = [
   new Producto(1, "Router MikroTik", 120.00, "Redes", 10),
@@ -220,3 +223,76 @@ function initProductoDetalle() {
     }
   });
 }
+
+// =========================
+// PRUEBAS PATRONES DE DISEÑO
+// Singleton, Factory, Observer
+// =========================
+
+// ---------- SINGLETON ----------
+console.log("===== PRUEBA SINGLETON =====");
+
+const config1 = ConfiguracionSistema.getInstancia();
+const config2 = ConfiguracionSistema.getInstancia();
+
+console.log("¿Es la misma instancia?", config1 === config2);
+console.log("Configuración inicial:", config1.getTodas());
+
+config1.setConfiguracion("tema", "claro");
+console.log("Configuración actualizada desde config2:", config2.getTodas());
+
+// ---------- FACTORY ----------
+console.log("===== PRUEBA FACTORY =====");
+
+const productoFisico = FabricaEntidades.crearProducto("fisico", {
+  id: 101,
+  nombre: "Router MikroTik",
+  precio: 2500,
+  categoria: "Redes",
+  stock: 8
+});
+
+const productoDigital = FabricaEntidades.crearProducto("digital", {
+  id: 102,
+  nombre: "Licencia VoIP",
+  precio: 1200,
+  categoria: "Software",
+  stock: 50
+});
+
+const usuarioCliente = FabricaEntidades.crearUsuario("cliente", {
+  id: 1,
+  nombre: "Carlos",
+  correo: "carlos@gmail.com",
+  password: "123456"
+});
+
+const usuarioAdmin = FabricaEntidades.crearUsuario("admin", {
+  id: 2,
+  nombre: "Admin Ping-T",
+  correo: "admin@pingt.com",
+  password: "admin123"
+});
+
+console.log("Producto físico creado:", productoFisico);
+console.log("Producto digital creado:", productoDigital);
+console.log("Usuario cliente creado:", usuarioCliente);
+console.log("Rol cliente:", usuarioCliente.rol);
+console.log("Usuario admin creado:", usuarioAdmin);
+console.log("Rol admin:", usuarioAdmin.rol);
+
+// ---------- OBSERVER ----------
+console.log("===== PRUEBA OBSERVER =====");
+
+class ObservadorUI {
+  actualizar(evento) {
+    console.log("Notificación recibida:", evento);
+  }
+}
+
+const pedido = new Pedido();
+const observador = new ObservadorUI();
+
+pedido.suscribir(observador);
+pedido.cambiarEstado("enviado");
+pedido.cambiarEstado("entregado");
