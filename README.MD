@@ -109,7 +109,73 @@ Se implementó una validación crítica:
 - No se permite agregar más productos que el stock disponible
 - Se muestra un mensaje de error si se intenta exceder el límite
 
+## Abstracción y Gestión de Inventario
 
+Se implementó abstracción mediante la creación de la clase `GestorInventario`, la cual funciona como una clase abstracta simulada en JavaScript. Esta clase define métodos generales como:
+
+- añadirProducto()
+- eliminarProducto()
+- actualizarStock()
+
+Estos métodos deben ser implementados obligatoriamente por cualquier clase que extienda esta base.
+
+A partir de esta abstracción se desarrollaron:
+
+- `InventarioFisico`
+- `InventarioDigital`
+
+Cada una implementa su propia lógica para la gestión de productos, permitiendo manejar diferentes tipos de inventario dentro del sistema.
+
+Además, se aplicó encapsulamiento mediante el uso de atributos privados (`#productos`) y acceso controlado mediante getters.
+
+---
+
+## Interfaces para Procesos de Pago
+
+Se implementó una interfaz simulada denominada `ProcesoPago`, debido a que JavaScript no cuenta con interfaces nativas. Esta define los siguientes métodos:
+
+- iniciarPago()
+- verificarPago()
+- confirmarPago()
+
+A partir de esta interfaz se desarrollaron las clases:
+
+- `PagoTarjeta`
+- `PagoPayPal`
+
+Cada clase implementa estos métodos con su propia lógica, asegurando que todos los procesos de pago cumplan con un mismo contrato.
+
+Se incorporaron validaciones como:
+
+- Verificación de monto válido
+- Validación de datos de tarjeta
+- Validación de correo en PayPal
+- Control de estado del pago (pendiente, iniciado, verificado, confirmado)
+
+---
+
+## Desafíos y Soluciones
+
+**Desafío:** JavaScript no cuenta con soporte nativo para clases abstractas e interfaces.  
+**Solución:** Se simularon utilizando clases base con validaciones en el constructor (`new.target`) y métodos que lanzan errores si no son implementados.
+
+**Desafío:** Mantener la integridad de los datos del sistema.  
+**Solución:** Se implementaron validaciones en métodos y setters, evitando valores inválidos como stock negativo o datos incompletos.
+
+**Desafío:** Evitar la manipulación directa de los datos internos.  
+**Solución:** Se utilizó encapsulamiento con atributos privados (`#`) y acceso mediante getters y métodos controlados.
+
+---
+
+## Evidencia de Funcionalidad
+
+El sistema permite:
+
+- Gestión de inventario con diferentes tipos (físico y digital)
+- Validación de stock antes de agregar productos al carrito
+- Simulación de procesos de pago con múltiples métodos
+- Control de flujo de pago (inicio → verificación → confirmación)
 
 ## Autor
 Abner Funez
+
