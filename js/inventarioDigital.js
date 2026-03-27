@@ -1,40 +1,33 @@
-import { GestorInventario } from "./gestorInventario.js";
-
-export class InventarioDigital extends GestorInventario {
-  #productos;
-
-  constructor(productos = []) {
-    super();
-    this.#productos = Array.isArray(productos) ? productos : [];
+class InventarioDigital extends GestorInventario {
+  constructor(listaProductos) {
+    super(listaProductos);
   }
 
-  get productos() {
-    return [...this.#productos];
+  // En digital asumimos espacio ilimitado
+  verificarEspacio(producto) {
+    return true;
   }
 
-  añadirProducto(producto) {
-    if (!producto || typeof producto !== "object") {
-      throw new Error("Producto digital inválido");
+  // Prepara el producto como digital
+  prepararProducto(producto) {
+    if (!producto) {
+      throw new Error("Producto inválido.");
     }
 
-    this.#productos.push(producto);
+    producto.tipo = "digital";
+    producto.stock = 9999; // disponibilidad virtual
   }
 
-  eliminarProducto(id) {
-    this.#productos = this.#productos.filter(producto => producto.id !== id);
-  }
-
-  actualizarStock(id, cantidad) {
-    if (cantidad < 0) {
-      throw new Error("La disponibilidad no puede ser negativa");
-    }
-
-    const producto = this.#productos.find(producto => producto.id === id);
+  // En digital el stock siempre es "ilimitado"
+  actualizarStock(idProducto, nuevoStock) {
+    const producto = this.buscarProductoPorId(idProducto);
 
     if (!producto) {
-      throw new Error("Producto digital no encontrado");
+      throw new Error("Producto no encontrado.");
     }
 
-    producto.stock = cantidad;
+    producto.stock = 9999;
+
+    return `Stock digital actualizado (ilimitado) para "${producto.nombre}"`;
   }
 }

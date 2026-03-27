@@ -1,40 +1,43 @@
-import { GestorInventario } from "./gestorInventario.js";
+class InventarioFisico extends GestorInventario {
+  #capacidadMaxima;
 
-export class InventarioFisico extends GestorInventario {
-  #productos;
-
-  constructor(productos = []) {
-    super();
-    this.#productos = Array.isArray(productos) ? productos : [];
+  constructor(listaProductos, capacidadMaxima = 100) {
+    super(listaProductos);
+    this.#capacidadMaxima = capacidadMaxima;
   }
 
-  get productos() {
-    return [...this.#productos];
+  // Verifica si hay espacio físico disponible
+  verificarEspacio(producto) {
+    return this.obtenerProductos().length < this.#capacidadMaxima;
   }
 
-  añadirProducto(producto) {
-    if (!producto || typeof producto !== "object") {
-      throw new Error("Producto inválido");
+  // Prepara el producto antes de agregarlo
+  prepararProducto(producto) {
+    if (!producto) {
+      throw new Error("Producto inválido.");
     }
 
-    this.#productos.push(producto);
+    producto.tipo = "fisico";
+
+    if (!Number.isInteger(producto.stock) || producto.stock < 0) {
+      throw new Error("Stock inválido para inventario físico.");
+    }
   }
 
-  eliminarProducto(id) {
-    this.#productos = this.#productos.filter(producto => producto.id !== id);
-  }
-
-  actualizarStock(id, cantidad) {
-    if (cantidad < 0) {
-      throw new Error("El stock no puede ser negativo");
+  // Actualiza el stock real del producto
+  actualizarStock(idProducto, nuevoStock) {
+    if (!Number.isInteger(nuevoStock) || nuevoStock < 0) {
+      throw new Error("Stock inválido (no puede ser negativo).");
     }
 
-    const producto = this.#productos.find(producto => producto.id === id);
+    const producto = this.buscarProductoPorId(idProducto);
 
     if (!producto) {
-      throw new Error("Producto no encontrado");
+      throw new Error("Producto no encontrado.");
     }
 
-    producto.stock = cantidad;
+    producto.stock = nuevoStock;
+
+    return `Stock actualizado. Nuevo stock de "${producto.nombre}": ${producto.stock}`;
   }
 }

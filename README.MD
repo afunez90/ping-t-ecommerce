@@ -176,6 +176,23 @@ El sistema permite:
 - Simulación de procesos de pago con múltiples métodos
 - Control de flujo de pago (inicio → verificación → confirmación)
 
+## Patrones de Diseño Implementados
+
+### Singleton
+Se implementó la clase `ConfiguracionSistema` utilizando el patrón Singleton, garantizando una única instancia para manejar configuraciones globales del sistema, como idioma, moneda, tema e impuesto.
+
+### Factory
+Se implementó la clase `FabricaEntidades` para centralizar la creación de objetos del sistema. Esta permite instanciar productos físicos y digitales, así como usuarios cliente y administrador, según los parámetros proporcionados.
+
+### Observer
+Se implementó un sistema de notificaciones mediante el patrón Observer. A través de la clase `Pedido` y `SistemaNotificaciones`, diferentes componentes pueden suscribirse a eventos y ser notificados cuando ocurre un cambio, como la actualización del estado de un pedido.
+
+### Evidencia de pruebas
+Se realizaron pruebas en consola para verificar:
+- Singleton: confirmación de una única instancia
+- Factory: creación dinámica de productos y usuarios
+- Observer: recepción de notificaciones ante cambios de estado
+
 ## Autor
 Abner Funez
 
