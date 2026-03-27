@@ -193,6 +193,20 @@ Se realizaron pruebas en consola para verificar:
 - Factory: creación dinámica de productos y usuarios
 - Observer: recepción de notificaciones ante cambios de estado
 
+## Manejo de excepciones
+Se implementaron excepciones personalizadas para errores críticos del sistema, como inventario insuficiente, producto no encontrado, usuario inválido, carrito vacío y stock inválido.
+
+## Pruebas unitarias
+Se utilizaron pruebas unitarias con Jest para validar la lógica de negocio de las clases principales:
+- Carrito
+- Usuario
+- InventarioFisico
+- InventarioDigital
+
+### Ejecutar pruebas
+```bash
+npm test
+
 ## Autor
 Abner Funez
 
