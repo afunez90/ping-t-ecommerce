@@ -3,6 +3,8 @@ import { Carrito } from './carrito.js';
 import { Pedido } from "./pedido.js";
 import { ConfiguracionSistema } from "./configuracionSistema.js";
 import { FabricaEntidades } from "./fabricaEntidades.js";
+import { InventarioFisico } from './inventarioFisico.js';
+import { InventarioDigital } from './inventarioDigital.js';
 
 const productos = [
   new Producto(1, "Router MikroTik", 120.00, "Redes", 10),

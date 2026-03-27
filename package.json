@@ -1,0 +1,15 @@
+{
+  "name": "ping-t",
+  "version": "1.0.0",
+  "description": "Proyecto e-commerce Ping-T",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^30.0.0"
+  }
+}

@@ -1,33 +1,34 @@
-class InventarioDigital extends GestorInventario {
+// js/inventarioDigital.js
+
+import { GestorInventario } from "./inventario.js";
+import { ProductoNoEncontradoExcepcion } from "./excepciones.js";
+
+export class InventarioDigital extends GestorInventario {
   constructor(listaProductos) {
     super(listaProductos);
   }
 
-  // En digital asumimos espacio ilimitado
-  verificarEspacio(producto) {
+  verificarEspacio() {
     return true;
   }
 
-  // Prepara el producto como digital
   prepararProducto(producto) {
     if (!producto) {
-      throw new Error("Producto inválido.");
+      throw new ProductoNoEncontradoExcepcion("Producto inválido.");
     }
 
     producto.tipo = "digital";
-    producto.stock = 9999; // disponibilidad virtual
+    producto.stock = 9999;
   }
 
-  // En digital el stock siempre es "ilimitado"
-  actualizarStock(idProducto, nuevoStock) {
+  actualizarStock(idProducto) {
     const producto = this.buscarProductoPorId(idProducto);
 
     if (!producto) {
-      throw new Error("Producto no encontrado.");
+      throw new ProductoNoEncontradoExcepcion("Producto no encontrado.");
     }
 
     producto.stock = 9999;
-
-    return `Stock digital actualizado (ilimitado) para "${producto.nombre}"`;
+    return producto;
   }
 }

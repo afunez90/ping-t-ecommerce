@@ -1,43 +1,52 @@
-class InventarioFisico extends GestorInventario {
+// js/inventarioFisico.js
+
+import { GestorInventario } from "./inventario.js";
+import {
+  ProductoNoEncontradoExcepcion,
+  StockInvalidoExcepcion
+} from "./excepciones.js";
+
+export class InventarioFisico extends GestorInventario {
   #capacidadMaxima;
 
   constructor(listaProductos, capacidadMaxima = 100) {
     super(listaProductos);
+
+    if (!Number.isInteger(capacidadMaxima) || capacidadMaxima <= 0) {
+      throw new StockInvalidoExcepcion("Capacidad inválida.");
+    }
+
     this.#capacidadMaxima = capacidadMaxima;
   }
 
-  // Verifica si hay espacio físico disponible
-  verificarEspacio(producto) {
+  verificarEspacio() {
     return this.obtenerProductos().length < this.#capacidadMaxima;
   }
 
-  // Prepara el producto antes de agregarlo
   prepararProducto(producto) {
     if (!producto) {
-      throw new Error("Producto inválido.");
+      throw new ProductoNoEncontradoExcepcion("Producto inválido.");
     }
 
     producto.tipo = "fisico";
 
     if (!Number.isInteger(producto.stock) || producto.stock < 0) {
-      throw new Error("Stock inválido para inventario físico.");
+      throw new StockInvalidoExcepcion("Stock inválido.");
     }
   }
 
-  // Actualiza el stock real del producto
   actualizarStock(idProducto, nuevoStock) {
     if (!Number.isInteger(nuevoStock) || nuevoStock < 0) {
-      throw new Error("Stock inválido (no puede ser negativo).");
+      throw new StockInvalidoExcepcion("Stock inválido.");
     }
 
     const producto = this.buscarProductoPorId(idProducto);
 
     if (!producto) {
-      throw new Error("Producto no encontrado.");
+      throw new ProductoNoEncontradoExcepcion("Producto no encontrado.");
     }
 
     producto.stock = nuevoStock;
-
-    return `Stock actualizado. Nuevo stock de "${producto.nombre}": ${producto.stock}`;
+    return producto;
   }
 }

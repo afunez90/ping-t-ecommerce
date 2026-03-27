@@ -1,129 +1,125 @@
+// js/carrito.js
+
+import {
+  CarritoVacioExcepcion,
+  InventarioInsuficienteExcepcion,
+  ProductoNoEncontradoExcepcion,
+  StockInvalidoExcepcion
+} from "./excepciones.js";
+
 export class Carrito {
-    #items;
+  #items;
 
-    constructor() {
-        const guardado = JSON.parse(localStorage.getItem("carrito"));
-        this.#items = Array.isArray(guardado) ? guardado : [];
+  constructor() {
+    this.#items = [];
+  }
+
+  get items() {
+    return this.#items;
+  }
+
+  agregarProducto(producto, cantidad = 1) {
+    if (!producto) {
+      throw new ProductoNoEncontradoExcepcion("El producto no existe.");
     }
 
-    get items() {
-        return [...this.#items];
+    if (!Number.isInteger(cantidad) || cantidad <= 0) {
+      throw new StockInvalidoExcepcion("La cantidad debe ser un entero mayor que cero.");
     }
 
-    guardar() {
-        localStorage.setItem("carrito", JSON.stringify(this.#items));
+    if (!Number.isInteger(producto.stock) || producto.stock < cantidad) {
+      throw new InventarioInsuficienteExcepcion("No hay suficiente stock disponible.");
     }
 
-    agregarProducto(producto, cantidad = 1) {
-        if (!producto || typeof producto !== "object") {
-            throw new Error("Producto inválido");
-        }
+    const itemExistente = this.#items.find(
+      (item) => item.producto.id === producto.id
+    );
 
-        if (cantidad <= 0) {
-            throw new Error("Cantidad inválida");
-        }
+    if (itemExistente) {
+      const nuevaCantidad = itemExistente.cantidad + cantidad;
 
-        const existente = this.#items.find(
-            item => item.producto && item.producto.id === producto.id
+      if (nuevaCantidad > producto.stock) {
+        throw new InventarioInsuficienteExcepcion(
+          "No se puede agregar más cantidad que el stock disponible."
         );
+      }
 
-        if (existente) {
-            const nuevaCantidad = existente.cantidad + cantidad;
-
-            if (nuevaCantidad > producto.stock) {
-                throw new Error(`No puedes agregar más de ${producto.stock} unidades de ${producto.nombre}`);
-            }
-
-            existente.cantidad = nuevaCantidad;
-        } else {
-            if (cantidad > producto.stock) {
-                throw new Error(`No puedes agregar más de ${producto.stock} unidades de ${producto.nombre}`);
-            }
-
-            this.#items.push({
-                producto: {
-                    id: producto.id,
-                    nombre: producto.nombre,
-                    precio: Number(producto.precio),
-                    categoria: producto.categoria,
-                    stock: Number(producto.stock)
-                },
-                cantidad: Number(cantidad)
-            });
-        }
-
-        this.guardar();
+      itemExistente.cantidad = nuevaCantidad;
+    } else {
+      this.#items.push({ producto, cantidad });
     }
 
-    actualizarCantidad(index, nuevaCantidad) {
-        if (index < 0 || index >= this.#items.length) {
-            throw new Error("Índice inválido");
-        }
+    return this.#items;
+  }
 
-        if (nuevaCantidad <= 0) {
-            throw new Error("La cantidad debe ser mayor que cero");
-        }
-
-        const item = this.#items[index];
-
-        if (nuevaCantidad > item.producto.stock) {
-            throw new Error(`Solo hay ${item.producto.stock} unidades disponibles`);
-        }
-
-        item.cantidad = Number(nuevaCantidad);
-        this.guardar();
+  eliminarProducto(index) {
+    if (this.#items.length === 0) {
+      throw new CarritoVacioExcepcion("No se puede eliminar porque el carrito está vacío.");
     }
 
-    aumentarCantidad(index) {
-        if (index < 0 || index >= this.#items.length) {
-            throw new Error("Índice inválido");
-        }
-
-        const item = this.#items[index];
-
-        if (item.cantidad >= item.producto.stock) {
-            throw new Error(`Solo hay ${item.producto.stock} unidades disponibles`);
-        }
-
-        item.cantidad += 1;
-        this.guardar();
+    if (!Number.isInteger(index) || index < 0 || index >= this.#items.length) {
+      throw new ProductoNoEncontradoExcepcion("No se encontró el producto en el carrito.");
     }
 
-    disminuirCantidad(index) {
-        if (index < 0 || index >= this.#items.length) {
-            throw new Error("Índice inválido");
-        }
+    return this.#items.splice(index, 1)[0];
+  }
 
-        const item = this.#items[index];
-
-        if (item.cantidad > 1) {
-            item.cantidad -= 1;
-        } else {
-            this.#items.splice(index, 1);
-        }
-
-        this.guardar();
+  aumentarCantidad(index) {
+    if (this.#items.length === 0) {
+      throw new CarritoVacioExcepcion("El carrito está vacío.");
     }
 
-    eliminarProducto(index) {
-        if (index < 0 || index >= this.#items.length) {
-            throw new Error("Índice inválido");
-        }
-
-        this.#items.splice(index, 1);
-        this.guardar();
+    if (!Number.isInteger(index) || index < 0 || index >= this.#items.length) {
+      throw new ProductoNoEncontradoExcepcion("Índice de producto inválido.");
     }
 
-    vaciarCarrito() {
-        this.#items = [];
-        this.guardar();
+    const item = this.#items[index];
+
+    if (item.cantidad + 1 > item.producto.stock) {
+      throw new InventarioInsuficienteExcepcion(
+        "No hay suficiente stock para aumentar la cantidad."
+      );
     }
 
-    calcularTotal() {
-        return this.#items.reduce((total, item) => {
-            const precio = Number(item.producto.precio);
-            const cantidad = Number(item.cantidad);
-            return total + (precio * cantidad);
-        }, 0);
+    item.cantidad += 1;
+    return item;
+  }
+
+  disminuirCantidad(index) {
+    if (this.#items.length === 0) {
+      throw new CarritoVacioExcepcion("El carrito está vacío.");
     }
+
+    if (!Number.isInteger(index) || index < 0 || index >= this.#items.length) {
+      throw new ProductoNoEncontradoExcepcion("Índice de producto inválido.");
+    }
+
+    const item = this.#items[index];
+
+    if (item.cantidad > 1) {
+      item.cantidad -= 1;
+      return item;
+    }
+
+    return this.eliminarProducto(index);
+  }
+
+  calcularTotal() {
+    if (this.#items.length === 0) {
+      return 0;
+    }
+
+    return this.#items.reduce((total, item) => {
+      return total + Number(item.producto.precio) * Number(item.cantidad);
+    }, 0);
+  }
+
+  vaciarCarrito() {
+    if (this.#items.length === 0) {
+      throw new CarritoVacioExcepcion("El carrito ya está vacío.");
+    }
+
+    this.#items = [];
+    return true;
+  }
 }

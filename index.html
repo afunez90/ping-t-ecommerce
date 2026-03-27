@@ -1,54 +1,56 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="assets/img/logo-pingt.png">
-    <title>Ping-T | Equipos de Telecomunicaciones</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <link rel="icon" href="assets/img/logo-pingt.png">
+  <title>Ping-T | Equipos de Telecomunicaciones</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Enlace al CSS -->
-    <link rel="stylesheet" href="css/styles.css">
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
 
-    <header>
-        <h1>Ping-T</h1>
-        <nav>
-            <a href="index.html">Inicio</a>
-            <a class="btn" href="catalogo.html">Ver Catálogo</a>
+  <!-- HEADER -->
+  <header>
+    <h1>Ping-T</h1>
+    <nav>
+      <a href="index.html">Inicio</a>
+      <a href="catalogo.html">Ver Catálogo</a>
+      <a href="login.html">Login</a>
+      <a href="carrito.html">
+        Carrito (<span id="contadorCarrito">0</span>)
+      </a>
+    </nav>
+  </header>
 
-            <a href="login.html">Login</a>
+  <!-- CONTENIDO PRINCIPAL -->
+  <main>
+    <section>
+      <h2>Bienvenido a Ping-T</h2>
 
-<a href="carrito.html">Carrito (<span id="contadorCarrito">0</span>)</a>
-</a>
-        </nav>
-    </header>
+      <section class="hero">
+        <img src="assets/img/portada.png" alt="Equipos de telecomunicaciones">
+        <div class="hero-overlay"></div>
 
-    <main>
-        <section>
-            <h2>Bienvenido a Ping-T</h2>
-            <section class="hero">
-  <img src="assets/img/portada.png" alt="Equipos de telecomunicaciones">
-  <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <h2>Equipos de Telecomunicaciones</h2>
+          <p>Soluciones profesionales para redes, wireless y cableado</p>
+        </div>
+      </section>
 
-  <div class="hero-content">
-    <h2>Equipos de Telecomunicaciones</h2>
-    <p>Soluciones profesionales para redes, wireless y cableado</p>
+    </section>
+  </main>
 
-  </div>
-</section>
-            
-       
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2026 Ping-T - Todos los derechos reservados</p>
+  </footer>
 
-</section>
-     
-        </section>
-    </main>
 
-    <footer>
-        <p>© 2026 Ping-T - Todos los derechos reservados</p>
-    </footer>
 
-<script type="module" src="js/app.js"></script>
+  <script type="module" src="js/app.js"></script>
+
 </body>
 </html>
